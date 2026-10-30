@@ -6,7 +6,23 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: renderAppBar(),
       body: Text('Home Screen'),
+    );
+  }
+
+  // AppBar를 구현하는 함수
+  AppBar renderAppBar() {
+    return AppBar(
+      centerTitle: true,
+      title: Text(
+        'Attendance Check',
+        style: TextStyle(
+          color: Colors.blueAccent,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+      backgroundColor: Colors.white,
     );
   }
 }
