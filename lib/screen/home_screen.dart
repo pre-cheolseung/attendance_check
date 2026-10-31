@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import 'package:geolocator/geolocator.dart';
+
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);   // const 생성자 : 최초 선언 후 변경 불가능한 빌드 타임 함수
 
@@ -69,5 +71,32 @@ class HomeScreen extends StatelessWidget {
       ),
       backgroundColor: Colors.white,
     );
+  }
+
+  Future<String> checkPermission() async {
+    final isLocationEnabled = await Geolocator.isLocationServiceEnabled();   // 위치 서비스 활성화 여부 확인
+
+    // 위치 서비스 활성화 안됨
+    if (!isLocationEnabled) {
+      return 'Please enable location services.';
+    }
+
+    LocationPermission checkedPermission = await Geolocator.checkPermission();   // 위치 권한 확인
+
+    // 위치 권한이 허가되지 않은 경우 요청
+    if (checkedPermission == LocationPermission.denied) {
+      checkedPermission = await Geolocator.requestPermission();
+
+      if (checkedPermission == LocationPermission.denied) {
+        return 'Please grant location permission.';
+      }
+    }
+
+    // 위치 권한이 허가되지 않았고 앱에서 재요청이 불가한 경우 요청
+    if (checkedPermission == LocationPermission.deniedForever) {
+      return 'Please grant the app location permission in Settings.';
+    }
+
+    return 'Location permission has been granted.';   // 위 조건이 모두 만족되면 위치 권한 허가 완료
   }
 }
