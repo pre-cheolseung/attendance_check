@@ -21,40 +21,60 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: renderAppBar(),
-      body: Column(
-        children: [
-          // 공간의 2/3 만큼 차지
-          Expanded(
-            flex: 2,
-            child: GoogleMap(
-              initialCameraPosition: CameraPosition(
-                target: placeLatLng,
-                zoom: 18,   // 확대 정도 (높을수록 크게 보임)
-              ),
-            ),
-          ),
-          // 공간의 1/3 만큼 차지
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+      body: FutureBuilder<String>(
+        future: checkPermission(),
+        builder: (context, snapshot) {
+          // 로딩 상태
+          if (!snapshot.hasData && snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          // 위치 권한 허가 상태
+          if (snapshot.data == 'Location permission has been granted.') {
+            return Column(
               children: [
-                // 시계 아이콘
-                Icon(
-                  Icons.timelapse_outlined,
-                  color: Colors.blueAccent,
-                  size: 50.0,
+                // 공간의 2/3 만큼 차지
+                Expanded(
+                  flex: 2,
+                  child: GoogleMap(
+                    initialCameraPosition: CameraPosition(
+                      target: placeLatLng,
+                      zoom: 18,   // 확대 정도 (높을수록 크게 보임)
+                    ),
+                  ),
                 ),
-                const SizedBox(height: 20.0),
-                // [Attendance!] 버튼
-                ElevatedButton(
-                  onPressed: () {},
-                  child: Text('Attendance!'),
+                // 공간의 1/3 만큼 차지
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // 시계 아이콘
+                      Icon(
+                        Icons.timelapse_outlined,
+                        color: Colors.blueAccent,
+                        size: 50.0,
+                      ),
+                      const SizedBox(height: 20.0),
+                      // [Attendance!] 버튼
+                      ElevatedButton(
+                        onPressed: () {},
+                        child: Text('Attendance!'),
+                      ),
+                    ],
+                  ),
                 ),
               ],
+            );
+          }
+          // 위치 권한 없는 상태
+          return Center(
+            child: Text(
+              snapshot.data.toString(),
             ),
-          ),
-        ],
-      ),
+          );
+        }
+      )
     );
   }
 
@@ -73,6 +93,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  // 위치 권한 사용 여부 확인 후, 사용할 수 없는 상태일 경우 권한을 재요청하는 함수
   Future<String> checkPermission() async {
     final isLocationEnabled = await Geolocator.isLocationServiceEnabled();   // 위치 서비스 활성화 여부 확인
 
