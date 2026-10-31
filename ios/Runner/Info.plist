@@ -67,9 +67,9 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
     <key>NSLocationWhenInUseUsageDescription</key>
-    <string>Location information is required while using the app</string>
+    <string>Location information is required while using the app.</string>
     <!-- 구형 iOS 버전 호환용 -->
     <key>NSLocationAlwaysUsageDescription</key>
-    <string>Location information is required</string>
+    <string>Location information is required.</string>
 </dict>
 </plist>
