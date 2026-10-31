@@ -47,8 +47,8 @@ app.*.map.json
 # Widget Preview related
 .widget_preview/
 
-# 🍏 iOS-related files
-**/ios/Runner/AppDelegate.swift
-
 # 🤖 Android-related files
 **/android/app/src/main/AndroidManifest.xml
+
+# 🍎 iOS-related files
+**/ios/Runner/AppDelegate.swift
