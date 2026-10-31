@@ -17,6 +17,12 @@ class HomeScreen extends StatelessWidget {
     127.12844715860939,   // 경도
   );
 
+  // 위치 마커 선언
+  static final Marker marker = Marker(
+    markerId: MarkerId('place'),
+    position: placeLatLng,
+  );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,6 +48,7 @@ class HomeScreen extends StatelessWidget {
                       target: placeLatLng,
                       zoom: 18,   // 확대 정도 (높을수록 크게 보임)
                     ),
+                    markers: Set.from([marker]),   // Set으로 Marker 제공
                   ),
                 ),
                 // 공간의 1/3 만큼 차지
