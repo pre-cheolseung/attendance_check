@@ -23,6 +23,16 @@ class HomeScreen extends StatelessWidget {
     position: placeLatLng,
   );
 
+  // 현재 위치 반경 표시
+  static final Circle circle = Circle(
+    circleId: CircleId('attendanceCheckCircle'),
+    center: placeLatLng,   // 원의 중심이 되는 위치로 LatLng 값을 제공
+    fillColor: Colors.blueAccent.withValues(alpha: 0.5),   // 원의 색상
+    radius: 100,   // 원의 반지름 (미터 단위)
+    strokeColor: Colors.blueAccent,   // 원의 테두리 색
+    strokeWidth: 1,   // 원의 테두리 두께
+  );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,6 +59,7 @@ class HomeScreen extends StatelessWidget {
                       zoom: 18,   // 확대 정도 (높을수록 크게 보임)
                     ),
                     markers: Set.from([marker]),   // Set으로 Marker 제공
+                    circles: Set.from([circle]),   // Set으로 Circle 제공
                   ),
                 ),
                 // 공간의 1/3 만큼 차지
