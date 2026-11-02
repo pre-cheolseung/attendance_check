@@ -77,7 +77,15 @@ class HomeScreen extends StatelessWidget {
                       const SizedBox(height: 20.0),
                       // [Attendance!] 버튼
                       ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () async {
+                          final currentPosition = await Geolocator.getCurrentPosition();   // 현재 위치
+                          final distance = Geolocator.distanceBetween(
+                            currentPosition.latitude,   // 현재 위치 위도
+                            currentPosition.longitude,   // 현재 위치 경도
+                            placeLatLng.latitude,   // 설정 위치 위도
+                            placeLatLng.longitude,   // 설정 위치 경도
+                          );
+                        },
                         child: Text('Attendance!'),
                       ),
                     ],
@@ -92,8 +100,8 @@ class HomeScreen extends StatelessWidget {
               snapshot.data.toString(),
             ),
           );
-        }
-      )
+        },
+      ),
     );
   }
 
