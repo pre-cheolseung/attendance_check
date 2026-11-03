@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:attendance_check/screen/settings_screen.dart';
 
 import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);   // const 생성자 : 최초 선언 후 변경 불가능한 빌드 타임 함수
@@ -36,7 +37,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: renderAppBar(),
+      appBar: renderAppBar(context),
       body: FutureBuilder<String>(
         future: checkPermission(),
         builder: (context, snapshot) {
@@ -138,7 +139,7 @@ class HomeScreen extends StatelessWidget {
   }
 
   // AppBar를 구현하는 함수
-  AppBar renderAppBar() {
+  AppBar renderAppBar(BuildContext context) {
     return AppBar(
       centerTitle: true,
       title: Text(
@@ -148,7 +149,24 @@ class HomeScreen extends StatelessWidget {
           fontWeight: FontWeight.w700,
         ),
       ),
+      actions: [
+        IconButton(
+          icon: const Icon(
+            Icons.settings,
+            color: Colors.black,
+          ),   // 설정 아이콘
+          onPressed: () {
+            // 개인 설정 페이지로 이동
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => const SettingsScreen(),
+              ),
+            );
+          },
+        ),
+      ],
       backgroundColor: Colors.white,
+      elevation: 0,   // 앱바 밑의 미세한 그림자(입체감)를 없애거나 조절
     );
   }
 
