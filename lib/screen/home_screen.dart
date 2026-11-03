@@ -27,9 +27,9 @@ class HomeScreen extends StatelessWidget {
   static final Circle circle = Circle(
     circleId: CircleId('attendanceCheckCircle'),
     center: placeLatLng,   // 원의 중심이 되는 위치로 LatLng 값을 제공
-    fillColor: Colors.blueAccent.withValues(alpha: 0.5),   // 원의 색상
+    fillColor: Colors.deepPurpleAccent.withValues(alpha: 0.5),   // 원의 색상
     radius: 100,   // 원의 반지름 (미터 단위)
-    strokeColor: Colors.blueAccent,   // 원의 테두리 색
+    strokeColor: Colors.deepPurpleAccent,   // 원의 테두리 색
     strokeWidth: 1,   // 원의 테두리 두께
   );
 
@@ -71,7 +71,7 @@ class HomeScreen extends StatelessWidget {
                       // 시계 아이콘
                       Icon(
                         Icons.timelapse_outlined,
-                        color: Colors.blueAccent,
+                        color: Colors.deepPurpleAccent,
                         size: 50.0,
                       ),
                       const SizedBox(height: 20.0),
@@ -79,11 +79,43 @@ class HomeScreen extends StatelessWidget {
                       ElevatedButton(
                         onPressed: () async {
                           final currentPosition = await Geolocator.getCurrentPosition();   // 현재 위치
+                          // 현재 위치와 설정 위치 간의 거리를 계산
                           final distance = Geolocator.distanceBetween(
                             currentPosition.latitude,   // 현재 위치 위도
                             currentPosition.longitude,   // 현재 위치 경도
                             placeLatLng.latitude,   // 설정 위치 위도
                             placeLatLng.longitude,   // 설정 위치 경도
+                          );
+                          bool canCheck = distance < 100;   // 100미터 이내에 있으면 출석체크 가능
+                          showDialog(
+                            context: context,
+                            builder: (_) {
+                              return AlertDialog(
+                                title: Text('Attendance!'),
+                                // 출석 가능 여부에 따라 다른 메시지 제공
+                                content: Text(
+                                  canCheck ? 'Would you like to attend?' : 'Not in a position to attend.',
+                                ),
+                                actions: [
+                                  TextButton(
+                                    // 취소를 누르면 false 반환
+                                    onPressed: () {
+                                      Navigator.of(context).pop(false);
+                                    },
+                                    child: Text('Cancel'),
+                                  ),
+                                  // 출근 가능한 상태일 때만 'Attendance' 버튼 제공
+                                  if (canCheck)
+                                    TextButton(
+                                      // 'Attendance' 버튼을 누르면 true 반환
+                                      onPressed: () {
+                                        Navigator.of(context).pop(true);
+                                      },
+                                      child: Text('Attendance'),
+                                    ),
+                                ],
+                              );
+                            },
                           );
                         },
                         child: Text('Attendance!'),
@@ -112,7 +144,7 @@ class HomeScreen extends StatelessWidget {
       title: Text(
         'Attendance Check',
         style: TextStyle(
-          color: Colors.blueAccent,
+          color: Colors.deepPurpleAccent,
           fontWeight: FontWeight.w700,
         ),
       ),
