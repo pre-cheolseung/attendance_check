@@ -40,6 +40,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  final _formKey = GlobalKey<FormState>();   // 입력 필드 제어를 위한 컨트롤러 및 폼 키
   final SendData sendDataToServer = SendData();   // 출석 정보를 서버로 보내서 저장하는 함수를 호출하기 위해 정의
   // 텍스트 입력을 제어하기 위한 컨트롤러
   final TextEditingController _nameController = TextEditingController();
@@ -85,22 +86,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await prefs.setString('user_name', _nameController.text);
     await prefs.setString('user_email', _emailController.text);
     
-    // 저장 후 화면 갱신
-    _loadSavedData();
-    
-    // 저장 완료 알림창
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.deepPurpleAccent,
-          content: Text(
-            'Personal settings have been saved.',
-            // style: TextStyle(
-            //   color: Colors.white,
-            // ),
+    // 유효성 검사(Validation) 통과 여부 확인
+    if (_formKey.currentState!.validate()) {
+      // 저장 후 화면 갱신
+      _loadSavedData();
+      
+      // 저장 완료 알림창
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Colors.deepPurpleAccent,
+            content: Text(
+              'Personal settings have been saved.',
+              // style: TextStyle(
+              //   color: Colors.white,
+              // ),
+            ),
           ),
-        ),
-      );
+        );
+      }
     }
   }
 
@@ -129,79 +133,105 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 현재 저장된 정보 표시 영역
-            UserAccountsDrawerHeader(
-              accountName: Text(_savedName),
-              accountEmail: Text(_savedEmail),
-              currentAccountPicture: const CircleAvatar(
-                backgroundColor: Colors.white,
-                child: Icon(
-                  Icons.person,
-                  size: 40,
-                  color: Colors.grey,
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 현재 저장된 정보 표시 영역
+              UserAccountsDrawerHeader(
+                accountName: Text(_savedName),
+                accountEmail: Text(_savedEmail),
+                currentAccountPicture: const CircleAvatar(
+                  backgroundColor: Colors.white,
+                  child: Icon(
+                    Icons.person,
+                    size: 40,
+                    color: Colors.grey,
+                  ),
+                ),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor,
                 ),
               ),
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
+              const SizedBox(height: 24),
+              // 이름 수정 입력창
+              TextFormField(
+                controller: _nameController,
+                decoration: const InputDecoration(
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.deepPurpleAccent, width: 1.0),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.deepPurpleAccent, width: 3.0),
+                  ),
+                  hintText: 'Please enter your name.',
+                  hintStyle: TextStyle(color: Colors.deepPurpleAccent),
+                  labelText: 'Name',
+                  labelStyle: TextStyle(color: Colors.deepPurpleAccent),
+                  prefixIcon: Icon(
+                    Icons.person,
+                    color: Colors.deepPurpleAccent,
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Please enter your name.';
+                  }
+                  return null;
+                },
               ),
-            ),
-            const SizedBox(height: 24),
-            // 이름 수정 입력창
-            const Text(
-              'Edit name',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
+              const SizedBox(height: 16),
+              // 이메일 수정 입력창
+              TextFormField(
+                controller: _emailController,
+                decoration: const InputDecoration(
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.deepPurpleAccent, width: 1.0),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.deepPurpleAccent, width: 3.0),
+                  ),
+                  hintText: 'Please enter your e-mail.',
+                  hintStyle: TextStyle(color: Colors.deepPurpleAccent),
+                  labelText: 'E-mail',
+                  labelStyle: TextStyle(color: Colors.deepPurpleAccent),
+                  prefixIcon: Icon(
+                    Icons.email,
+                    color: Colors.deepPurpleAccent,
+                  ),
+                ),
+                keyboardType: TextInputType.emailAddress,   // 이메일 입력용 키보드 타입
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Please enter your e-mail.';
+                  }           
+                  if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',).hasMatch(value)) {
+                    return 'Please enter a valid email format.';
+                  }
+                  return null;
+                },
               ),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _nameController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Please enter a name.',
-              ),
-            ),
-            const SizedBox(height: 16),
-            // 이메일 수정 입력창
-            const Text(
-              'Edit e-mail',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _emailController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Please enter a e-mail.',
-              ),
-              keyboardType: TextInputType.emailAddress,   // 이메일 입력용 키보드 타입
-            ),
-            Spacer(),   // 중간의 남은 공간을 모두 차지하여 아래 위젯을 가장 밑으로 배치
-            // 저장 버튼
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: _saveData,
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.deepPurpleAccent),
-                child: const Text(
-                  'Save',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
+              Spacer(),   // 중간의 남은 공간을 모두 차지하여 아래 위젯을 가장 밑으로 배치
+              // 저장 버튼
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: _saveData,
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.deepPurpleAccent),
+                  child: const Text(
+                    'Save',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
