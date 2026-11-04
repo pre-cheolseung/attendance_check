@@ -1,6 +1,33 @@
 import 'package:flutter/material.dart';
 
+import 'package:attendance_check/components/send_data.dart';
+import 'package:attendance_check/components/user_info.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
+
+// 사용자 정보 클래스
+class UserInfoRepository {
+  final String user_name;
+  final String user_email;
+
+  // 생성자
+  UserInfoRepository({
+    required this.user_name,
+    required this.user_email
+  });
+
+  // 이름과 이메일을 Map 형태로 반환하는 함수
+  Map<String, String> getSavedUser() {
+    return {
+      'user_name': user_name,
+      'user_email': user_email,
+    };
+  }
+
+  // 디버깅 출력을 위한 toString 재정의
+  @override
+  String toString() => 'UserInfoRepository(user_name: $user_name, user_email: $user_email)';
+}
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);   // const 생성자 : 최초 선언 후 변경 불가능한 빌드 타임 함수
@@ -13,6 +40,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  final SendData sendDataToServer = SendData();   // 출석 정보를 서버로 보내서 저장하는 함수를 호출하기 위해 정의
   // 텍스트 입력을 제어하기 위한 컨트롤러
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -22,10 +50,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
-    _loadSavedData();   // 페이지가 시작될 때 저장된 이름 호출
+    _loadSavedData();   // 페이지가 시작될 때 저장된 사용자 정보 호출
   }
 
-  // 저장된 이름을 불러오는 함수
+  // 저장된 사용자 정보를 불러오는 함수
   Future<void> _loadSavedData() async {
     final prefs = await SharedPreferences.getInstance();
 
@@ -33,17 +61,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
     // 값 변경 시 build() 함수 재실행
     // Clean -> setState() -> Dirty -> build() -> Clean
     setState(() {
-      // 'user_name' 키로 저장된 값을 호출 (없으면 null 반환하므로 기본값 설정)
+      // 'user_name' 또는 'user_email' 키로 저장된 값을 호출 (없으면 null 반환하므로 기본값 설정)
       _savedName = prefs.getString('user_name') ?? "No name has been registered.";
       _savedEmail = prefs.getString('user_email') ?? "No e-mail has been registered.";
       _nameController.text = prefs.getString('user_name') ?? "";
       _emailController.text = prefs.getString('user_email') ?? "";
     });
+
+    // 싱글톤 인스턴스를 가져와서 값을 저장
+    // 애플리케이션 전체에서 단 하나의 인스턴스만 생성하고, 어디서나 그 인스턴스에 전역적으로 접근할 수 있도록 보장하는 디자인 패턴
+    UserInfo().updateUserInfo(
+      name: _savedName,
+      email: _savedEmail,
+    );
+
+    print('_loadSavedData() : Name = $_savedName, Email = $_savedEmail');   // 콘솔에서 저장 결과 확인
   }
 
-  // 입력한 이름을 저장하는 함수
+  // 입력한 사용자 정보를 저장하는 함수
   Future<void> _saveData() async {
     final prefs = await SharedPreferences.getInstance();
+
     await prefs.setString('user_name', _nameController.text);
     await prefs.setString('user_email', _emailController.text);
     
@@ -64,6 +102,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       );
     }
+  }
+
+  // 컨트롤러 해제
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+
+    super.dispose();
   }
 
   @override
@@ -134,6 +181,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 border: OutlineInputBorder(),
                 hintText: 'Please enter a e-mail.',
               ),
+              keyboardType: TextInputType.emailAddress,   // 이메일 입력용 키보드 타입
             ),
             Spacer(),   // 중간의 남은 공간을 모두 차지하여 아래 위젯을 가장 밑으로 배치
             // 저장 버튼

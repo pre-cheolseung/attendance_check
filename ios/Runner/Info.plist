@@ -71,5 +71,12 @@
     <!-- 구형 iOS 버전 호환용 -->
     <key>NSLocationAlwaysUsageDescription</key>
     <string>Location information is required.</string>
+    <!-- http 프로토콜 허용 -->
+    <dict>
+        <key>NSAllowsLocalNetworking</key>
+        <true/>
+        <key>NSAllowsArbitraryLoadsInWebContent</key>
+        <true/>
+    </dict>
 </dict>
 </plist>

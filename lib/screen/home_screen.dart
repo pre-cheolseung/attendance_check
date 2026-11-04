@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
+import 'package:attendance_check/components/send_data.dart';
 import 'package:attendance_check/screen/settings_screen.dart';
 
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({Key? key}) : super(key: key);   // const 생성자 : 최초 선언 후 변경 불가능한 빌드 타임 함수
+  HomeScreen({Key? key}) : super(key: key);   // const 생성자 : 최초 선언 후 변경 불가능한 빌드 타임 함수
 
   // 지도 초기화 위치
   static final LatLng placeLatLng = LatLng(
@@ -33,6 +34,8 @@ class HomeScreen extends StatelessWidget {
     strokeColor: Colors.deepPurpleAccent,   // 원의 테두리 색
     strokeWidth: 1,   // 원의 테두리 두께
   );
+
+  final SendData sendData = SendData();
 
   @override
   Widget build(BuildContext context) {
@@ -99,18 +102,19 @@ class HomeScreen extends StatelessWidget {
                                 ),
                                 actions: [
                                   TextButton(
-                                    // 취소를 누르면 false 반환
+                                    // 'Cancel' 버튼을 누르면 false 반환하며 가장 가까이 있는 context 호출
                                     onPressed: () {
-                                      Navigator.of(context).pop(false);
+                                      Navigator.of(context).pop(false);   // Navigator.pop(context)
                                     },
                                     child: Text('Cancel'),
                                   ),
-                                  // 출근 가능한 상태일 때만 'Attendance' 버튼 제공
+                                  // 출석 가능한 상태일 때만 'Attendance' 버튼 제공
                                   if (canCheck)
                                     TextButton(
-                                      // 'Attendance' 버튼을 누르면 true 반환
-                                      onPressed: () {
-                                        Navigator.of(context).pop(true);
+                                      // 'Attendance' 버튼을 누르면 true 반환하며 가장 가까이 있는 context 호출
+                                      onPressed: () async {
+                                        Navigator.of(context).pop(true);   // Navigator.pop(context)
+                                        await sendData.sendDataToServer();   // 출석 정보를 서버로 보내서 저장하는 함수 호출
                                       },
                                       child: Text('Attendance'),
                                     ),
