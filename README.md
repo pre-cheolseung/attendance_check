@@ -1,17 +1,40 @@
-# attendance_check
+# Attendance Check
 
-A new Flutter project.
+Apps with attendance checking features.
 
-## Getting Started
+- Flutter 3.47.7
+- Dart 3.13.5
 
-This project is a starting point for a Flutter application.
+## Preparation
 
-A few resources to get you started if this is your first Flutter project:
+- Issuance of Google API for using Google Maps within the Google Cloud Platform.
+- Detailed location native permissions settings.
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+## Key Components
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- GoogleMap
+- Geolocator
+- Expanded
+- FutureBuilder
+- Marker
+- Circle
+- Dialog
+
+## Additional Components
+
+- Class
+- SendData
+- TextEditingController
+- SharedPreferences
+- SnackBar
+- Form
+- UserAccountsDrawerHeader
+- TextFormField
+
+## Plugin
+
+- geolocator: ^14.1.2
+- google_maps_flutter: ^2.19.0
+- http: ^1.6.0
+- intl: ^0.20.3
+- shared_preferences: ^2.5.6
